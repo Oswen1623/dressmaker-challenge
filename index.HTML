@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dressmaker - Challenge Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #FAF7F5;
+      --bg-surface: #FFFFFF;
+      --accent: #C87D60;
+      --accent-hover: #B56C50;
+      --accent-light: #F8EDE8;
+      --text-main: #2C2623;
+      --text-muted: #7A726D;
+      --border: #E8E2DE;
+      --shadow: 0 10px 30px -5px rgba(200, 125, 96, 0.08);
+      --shadow-hover: 0 15px 35px -5px rgba(200, 125, 96, 0.15);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.75rem;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .grid-settings {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.25rem 1rem;
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .setting-label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-main);
+    }
+
+    .counter-control {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-counter {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-counter:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .counter-value {
+      font-weight: 700;
+      font-size: 1.25rem;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .actions-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.9rem 2rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(200, 125, 96, 0.25);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(200, 125, 96, 0.35);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.9rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-muted);
+      color: var(--text-main);
+    }
+
+    .results-category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .category-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .category-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent-light);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .category-title span.count-tag {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.8rem;
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .item-chip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0.9rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .item-chip.locked {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .btn-lock {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 2px;
+    }
+
+    .empty-category {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+    }
+
+    .master-list-section {
+      margin-top: 3rem;
+    }
+
+    .details-toggle {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.75rem;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+      user-select: none;
+    }
+
+    .details-toggle:hover {
+      border-color: var(--accent);
+    }
+
+    .master-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      padding: 0 0.5rem;
+    }
+
+    .master-subtext {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .btn-reset-disabled {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .master-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+    }
+
+    .master-col h4 {
+      color: var(--accent);
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.4rem;
+    }
+
+    .master-col ul {
+      list-style: none;
+    }
+
+    .master-col li {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      padding: 0.35rem 0.5rem;
+      border-bottom: 1px dashed var(--border);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .master-col li:hover {
+      background: var(--bg-primary);
+    }
+
+    .master-col li.disabled-item {
+      color: var(--text-muted);
+      text-decoration: line-through;
+      opacity: 0.55;
+      background: transparent;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--text-main);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Dressmaker Challenge</h1>
+      <p class="subtitle">Randomize design constraints for your next creation</p>
+    </header>
+
+    <div class="card">
+      <div class="grid-settings">
+        <!-- Colors -->
+        <div class="setting-item">
+          <span class="setting-label">Colour</span>
+          <div class="counter-control">
+            <button class="btn-counter" onclick="adjustCount('colors', -1)">-</button>
+            <span class="counter-value" id="count-colors">1</span>
+            <button class="btn-counter" onclick="adjustCount('colors', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="setting-item">
+          <span class="setting-label">Tags</span>
+          <div class="counter-control">
+            <button class="btn-counter" onclick="adjustCount('tags', -1)">-</button>
+            <span class="counter-value" id="count-tags">1</span>
+            <button class="btn-counter" onclick="adjustCount('tags', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Fabrics -->
+        <div class="setting-item">
+          <span class="setting-label">Fabrics</span>
+          <div class="counter-control">
+            <button class="btn-counter" onclick="adjustCount('fabrics', -1)">-</button>
+            <span class="counter-value" id="count-fabrics">1</span>
+            <button class="btn-counter" onclick="adjustCount('fabrics', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Accessories -->
+        <div class="setting-item">
+          <span class="setting-label">Accessories</span>
+          <div class="counter-control">
+            <button class="btn-counter" onclick="adjustCount('accessories', -1)">-</button>
+            <span class="counter-value" id="count-accessories">1</span>
+            <button class="btn-counter" onclick="adjustCount('accessories', 1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button class="btn-primary" onclick="generateChallenge()">
+          ✨ Generate Challenge
+        </button>
+        <button class="btn-secondary" onclick="copyResults()">
+          📋 Copy Summary
+        </button>
+        <button class="btn-secondary" onclick="unlockAll()">
+          🔓 Unlock All
+        </button>
+      </div>
+    </div>
+
+    <!-- Results grouped into category columns -->
+    <div id="results" class="results-category-grid"></div>
+
+    <!-- Master List & Toggle Items -->
+    <div class="master-list-section">
+      <details>
+        <summary class="details-toggle">
+          <span>⚙️ Manage Game Options & Enable/Disable Items</span>
+          <span>▼</span>
+        </summary>
+
+        <div class="master-header">
+          <span class="master-subtext">Click any item to enable/disable it from the random pool.</span>
+          <button class="btn-reset-disabled" onclick="resetDisabledItems()">Reset All Enabled</button>
+        </div>
+
+        <div class="master-grid" id="master-list"></div>
+      </details>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Challenge copied to clipboard!</div>
+
+  <script>
+    // Official Dressmaker game terms
+    const criteria = {
+      colors: [
+        "Blue", "Green", "Pink", "Purple", "Red", "Yellow",
+        "Orange", "Black", "White", "Grey", "Brown"
+      ],
+      tags: [
+        "Casual", "Cool", "Cute", "Daywear", "Eclectic", "Elaborate", "Elegant",
+        "Eveningwear", "Flowers", "Formal", "Glamour", "Gothic", "Patterned",
+        "Playful", "Professional", "Risqué", "Romantic", "Shimmering", "Simple",
+        "Uncomfortable", "Warm", "Workwear"
+      ],
+      fabrics: [
+        "Cotton", "Linen", "Wool", "Silk", "Velvet", "Satin", "Lace", "Sequin", "Denim"
+      ],
+      accessories: [
+        "Buttons", "Bows", "Appliqué", "Lace Trim", "Brooch", "Tassels", "Jewels", "Trim"
+      ]
+    };
+
+    const categoryNames = {
+      colors: "Colour",
+      tags: "Tags",
+      fabrics: "Fabrics",
+      accessories: "Accessories"
+    };
+
+    const counts = { colors: 1, tags: 1, fabrics: 1, accessories: 1 };
+    let currentResults = [];
+    let disabledItems = new Set();
+
+    function adjustCount(cat, delta) {
+      counts[cat] = Math.max(0, counts[cat] + delta);
+      document.getElementById(`count-${cat}`).innerText = counts[cat];
+    }
+
+    function toggleItemDisabled(cat, val) {
+      const key = `${cat}:${val}`;
+      if (disabledItems.has(key)) {
+        disabledItems.delete(key);
+      } else {
+        disabledItems.add(key);
+      }
+      renderMasterList();
+    }
+
+    function resetDisabledItems() {
+      disabledItems.clear();
+      renderMasterList();
+    }
+
+    function getRandomItems(arr, count) {
+      const shuffled = [...arr].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+
+    function generateChallenge() {
+      const newResults = [];
+
+      Object.keys(counts).forEach(cat => {
+        const targetCount = counts[cat];
+        const lockedItems = currentResults.filter(item => item.category === cat && item.locked);
+
+        let chosenValues = lockedItems.map(item => item.value);
+        const neededCount = Math.max(0, targetCount - chosenValues.length);
+
+        // Filter out both already chosen items AND disabled items
+        const availablePool = criteria[cat].filter(val =>
+          !chosenValues.includes(val) && !disabledItems.has(`${cat}:${val}`)
+        );
+
+        const newlyDrawn = getRandomItems(availablePool, neededCount);
+
+        lockedItems.forEach(item => newResults.push(item));
+        newlyDrawn.forEach(val => {
+          newResults.push({ category: cat, value: val, locked: false, id: Math.random() });
+        });
+      });
+
+      currentResults = newResults;
+      renderResults();
+    }
+
+    function toggleLock(id) {
+      const item = currentResults.find(i => i.id === id);
+      if (item) item.locked = !item.locked;
+      renderResults();
+    }
+
+    function unlockAll() {
+      currentResults.forEach(item => item.locked = false);
+      renderResults();
+    }
+
+    function renderResults() {
+      const container = document.getElementById('results');
+
+      if (currentResults.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <p>All category counts are set to 0. Adjust the counters above and click <strong>Generate Challenge</strong>!</p>
+          </div>`;
+        return;
+      }
+
+      const categories = Object.keys(criteria);
+
+      container.innerHTML = categories.map(cat => {
+        const catItems = currentResults.filter(item => item.category === cat);
+
+        return `
+          <div class="category-card">
+            <div class="category-title">
+              <span>${categoryNames[cat]}</span>
+              <span class="count-tag">${catItems.length}</span>
+            </div>
+            <div class="item-list">
+              ${catItems.length > 0 ? catItems.map(item => `
+                <div class="item-chip ${item.locked ? 'locked' : ''}">
+                  <span>${item.value}</span>
+                  <button class="btn-lock" onclick="toggleLock(${item.id})">
+                    ${item.locked ? '🔒' : '🔓'}
+                  </button>
+                </div>
+              `).join('') : '<div class="empty-category">None selected</div>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMasterList() {
+      const masterContainer = document.getElementById('master-list');
+      masterContainer.innerHTML = Object.keys(criteria).map(cat => `
+        <div class="master-col">
+          <h4>${categoryNames[cat]}</h4>
+          <ul>
+            ${criteria[cat].map(val => {
+              const isDisabled = disabledItems.has(`${cat}:${val}`);
+              return `
+                <li class="${isDisabled ? 'disabled-item' : ''}" onclick="toggleItemDisabled('${cat}', '${val.replace(/'/g, "\\'")}')">
+                  <span>${val}</span>
+                  <span>${isDisabled ? '❌' : '✓'}</span>
+                </li>
+              `;
+            }).join('')}
+          </ul>
+        </div>
+      `).join('');
+    }
+
+    function copyResults() {
+      if (currentResults.length === 0) return;
+
+      let summary = "✨ Dressmaker Challenge ✨\n\n";
+      Object.keys(criteria).forEach(cat => {
+        const catItems = currentResults.filter(i => i.category === cat).map(i => i.value);
+        if (catItems.length > 0) {
+          summary += `${categoryNames[cat].toUpperCase()}: ${catItems.join(', ')}\n`;
+        }
+      });
+
+      navigator.clipboard.writeText(summary);
+
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Initial setup
+    generateChallenge();
+    renderMasterList();
+  </script>
+</body>
+</html>
